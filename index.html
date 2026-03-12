@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Morning Brief · Arco de São Jorge</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=JetBrains+Mono:wght@300;400;500&family=Lato:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #f2ece0;
+  --paper:    #faf6ee;
+  --ink:      #1c1a14;
+  --dim:      #6b6456;
+  --rule:     #d4cbbe;
+  --accent:   #8b3a2a;
+  --green:    #3a6b3a;
+  --blue:     #2a4a7a;
+  --gold:     #a07820;
+  --warn:     #c05020;
+  --calm:     #3a6b3a;
+  --watch:    #a07820;
+  --rebalance:#8b3a2a;
+  --col-gap:  28px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { font-size: 14px; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Lato', sans-serif;
+  font-weight: 300;
+  min-height: 100vh;
+}
+
+/* ── MASTHEAD ── */
+.masthead {
+  background: var(--ink);
+  color: var(--bg);
+  padding: 16px 36px 14px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 24px;
+  border-bottom: 3px solid var(--accent);
+}
+.mast-left { display: flex; flex-direction: column; gap: 4px; }
+.mast-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.6rem;
+  font-weight: 300;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  color: #f2ece0;
+}
+.mast-title em { font-style: italic; color: #c8a070; }
+.mast-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #8a8070;
+}
+.mast-right {
+  text-align: right;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  color: #8a8070;
+  line-height: 1.8;
+}
+.mast-right .live { color: #c8a070; }
+
+/* ── TICKER ── */
+.ticker {
+  background: #252018;
+  padding: 7px 36px;
+  display: flex;
+  gap: 32px;
+  align-items: center;
+  flex-wrap: wrap;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+}
+.tick { display: flex; align-items: center; gap: 8px; }
+.tick-lbl { color: #6a6050; letter-spacing: 0.12em; font-size: 0.58rem; text-transform: uppercase; }
+.tick-val { color: #d4cbbe; }
+.tick-val.up { color: #6aaa6a; }
+.tick-val.dn { color: #cc5544; }
+.tick-val.neu { color: #c8a060; }
+.tick-sep { color: #3a3428; }
+.tick-mood { color: #7a7060; font-style: italic; margin-left: auto; }
+
+/* ── LAYOUT ── */
+.wrap {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 36px 60px;
+}
+
+/* ── ACTION BAR ── */
+.action-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0 8px;
+  border-bottom: 1px solid var(--rule);
+  margin-bottom: 4px;
+}
+.gen-btn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: var(--ink);
+  color: var(--bg);
+  border: none;
+  padding: 7px 18px;
+  cursor: pointer;
+  transition: background 0.18s;
+}
+.gen-btn:hover { background: var(--accent); }
+.gen-btn:disabled { background: #8a8070; cursor: wait; }
+.last-run { font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; color: var(--dim); }
+
+/* ── PROGRESS ── */
+.prog-wrap { height: 28px; display: flex; flex-direction: column; justify-content: center; gap: 4px; margin-bottom: 20px; }
+.prog-lbl { font-family: 'JetBrains Mono', monospace; font-size: 0.58rem; color: var(--dim); letter-spacing: 0.1em; text-transform: uppercase; visibility: hidden; }
+.prog-lbl.on { visibility: visible; }
+.prog-track { height: 1px; background: var(--rule); }
+.prog-fill  { height: 100%; background: var(--ink); width: 0%; transition: width 0.5s ease; }
+
+/* ── COLUMNS ── */
+.cols {
+  display: grid;
+  grid-template-columns: 1fr 1px 1fr 1px 1fr 1px 1fr;
+  gap: 0;
+  align-items: start;
+}
+.col-rule { background: var(--rule); margin: 0 var(--col-gap); align-self: stretch; }
+.col { min-width: 0; }
+
+.col-hd {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.56rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--dim);
+  border-bottom: 1px solid var(--ink);
+  padding-bottom: 6px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.col-hd-left { display: flex; align-items: center; gap: 6px; }
+.col-icon { font-size: 0.8rem; }
+
+/* ── CARD ── */
+.card {
+  margin-bottom: 18px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--rule);
+}
+.card:last-child { border-bottom: none; margin-bottom: 0; }
+
+.card-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.54rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+  color: var(--accent);
+}
+.card-tag.g { color: var(--green); }
+.card-tag.b { color: var(--blue); }
+.card-tag.gold { color: var(--gold); }
+
+.card-hed {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.12rem;
+  font-weight: 600;
+  line-height: 1.28;
+  margin-bottom: 5px;
+}
+.card-body {
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: #3a3428;
+}
+.card-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.56rem;
+  color: var(--dim);
+  margin-top: 5px;
+}
+.card-why {
+  font-size: 0.78rem;
+  color: var(--dim);
+  font-style: italic;
+  margin-top: 4px;
+  line-height: 1.5;
+}
+
+/* ── QUIET DAY ── */
+.quiet {
+  padding: 14px;
+  background: #eef4ee;
+  border-left: 3px solid var(--green);
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: #2a3a2a;
+}
+.quiet-lbl {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.54rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--green);
+  display: block;
+  margin-bottom: 4px;
+}
+
+/* ── MACRO GAUGE ── */
+.gauge-wrap {
+  padding: 14px;
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  margin-bottom: 18px;
+}
+.gauge-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.54rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 10px;
+}
+.gauge-track {
+  height: 6px;
+  background: var(--rule);
+  border-radius: 3px;
+  margin-bottom: 8px;
+  position: relative;
+  overflow: hidden;
+}
+.gauge-bar {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.8s ease;
+}
+.gauge-bar.calm      { background: linear-gradient(90deg, #3a6b3a, #6aaa6a); }
+.gauge-bar.watch     { background: linear-gradient(90deg, #6aaa6a, #c8a060); }
+.gauge-bar.review    { background: linear-gradient(90deg, #c8a060, #cc5544); }
+.gauge-markers {
+  display: flex;
+  justify-content: space-between;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.52rem;
+  color: var(--dim);
+  margin-bottom: 8px;
+}
+.gauge-reading {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.64rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.gauge-reading.calm    { color: var(--calm); }
+.gauge-reading.watch   { color: var(--watch); }
+.gauge-reading.review  { color: var(--rebalance); }
+.gauge-reasons {
+  font-size: 0.78rem;
+  line-height: 1.55;
+  color: #3a3428;
+}
+
+/* ── WEATHER BLOCK ── */
+.wx-block {
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  padding: 12px 14px;
+  margin-bottom: 18px;
+}
+.wx-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.wx-cell { display: flex; flex-direction: column; gap: 2px; }
+.wx-lbl { font-family: 'JetBrains Mono', monospace; font-size: 0.52rem; color: var(--dim); letter-spacing: 0.1em; text-transform: uppercase; }
+.wx-val { font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; color: var(--ink); }
+.wx-val.big { font-size: 1.4rem; }
+.wx-precip {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--blue);
+  border-top: 1px solid var(--rule);
+  padding-top: 8px;
+  line-height: 1.7;
+}
+
+/* ── FARM ACTION ── */
+.farm-action {
+  background: #eef4ee;
+  border-left: 3px solid var(--green);
+  padding: 12px 14px;
+  margin-bottom: 18px;
+}
+.farm-action-lbl {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.54rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--green);
+  margin-bottom: 5px;
+}
+.farm-action-main {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.08rem;
+  font-weight: 600;
+  line-height: 1.3;
+  margin-bottom: 4px;
+}
+.farm-action-why {
+  font-size: 0.8rem;
+  line-height: 1.55;
+  color: #2a3a2a;
+}
+.farm-action-alt {
+  font-size: 0.75rem;
+  color: var(--dim);
+  margin-top: 6px;
+  font-style: italic;
+}
+
+/* ── LAND PROFILE ── */
+.land-toggle {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.54rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--dim);
+  cursor: pointer;
+  border: none;
+  background: none;
+  padding: 0;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.land-toggle:hover { color: var(--ink); }
+.land-panel {
+  display: none;
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  padding: 12px;
+  margin-bottom: 14px;
+  font-size: 0.8rem;
+}
+.land-panel.open { display: block; }
+.land-panel textarea {
+  width: 100%;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  border: 1px solid var(--rule);
+  background: var(--bg);
+  padding: 8px;
+  resize: vertical;
+  min-height: 80px;
+  color: var(--ink);
+  line-height: 1.6;
+}
+.land-panel textarea:focus { outline: 1px solid var(--ink); }
+.land-save {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.56rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: var(--ink);
+  color: var(--bg);
+  border: none;
+  padding: 5px 12px;
+  cursor: pointer;
+  margin-top: 6px;
+}
+.land-save:hover { background: var(--green); }
+
+/* ── FEEDBACK ── */
+.fb-row { display: flex; gap: 6px; margin-top: 8px; }
+.fb {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  padding: 3px 9px;
+  border: 1px solid var(--rule);
+  background: none;
+  cursor: pointer;
+  color: var(--dim);
+  transition: all 0.15s;
+  border-radius: 2px;
+}
+.fb:hover { border-color: var(--ink); color: var(--ink); }
+.fb.up   { background: #eef4ee; border-color: var(--green); color: var(--green); }
+.fb.down { background: #fdf0ee; border-color: var(--accent); color: var(--accent); }
+
+.taste-chip {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.52rem;
+  color: var(--dim);
+}
+
+/* ── LOADING ── */
+.ld { padding: 20px 0; }
+.ld-dots {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--dim);
+}
+.ld-dots::after { content: ''; animation: ldot 1.4s steps(4,end) infinite; }
+@keyframes ldot { 0%{content:''} 25%{content:'.'} 50%{content:'..'} 75%{content:'...'} }
+
+/* ── FOOTER ── */
+.footer {
+  margin-top: 40px;
+  padding-top: 12px;
+  border-top: 2px solid var(--ink);
+  display: flex;
+  justify-content: space-between;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.56rem;
+  color: var(--dim);
+}
+
+@media (max-width: 1000px) {
+  .cols { grid-template-columns: 1fr; }
+  .col-rule { display: none; }
+  html { font-size: 13px; }
+  .wrap, .masthead, .ticker { padding-left: 20px; padding-right: 20px; }
+}
+</style>
+</head>
+<body>
+
+<!-- MASTHEAD -->
+<div class="masthead">
+  <div class="mast-left">
+    <div class="mast-title">Morning <em>Brief</em></div>
+    <div class="mast-sub">Arco de São Jorge · Madeira · Personal Edition</div>
+  </div>
+  <div class="mast-right">
+    <div id="date-disp">—</div>
+    <div id="time-disp">—</div>
+    <div class="live" id="wx-station">IARCOD6</div>
+  </div>
+</div>
+
+<!-- MARKETS TICKER -->
+<div class="ticker">
+  <div class="tick">
+    <span class="tick-lbl">VIX</span>
+    <span class="tick-val" id="t-vix">—</span>
+  </div>
+  <span class="tick-sep">·</span>
+  <div class="tick">
+    <span class="tick-lbl">USD/BRL</span>
+    <span class="tick-val" id="t-brl">—</span>
+  </div>
+  <span class="tick-sep">·</span>
+  <div class="tick">
+    <span class="tick-lbl">EUR/USD</span>
+    <span class="tick-val" id="t-eur">—</span>
+  </div>
+  <span class="tick-sep">·</span>
+  <span class="tick-mood" id="t-mood">Press Generate to load</span>
+</div>
+
+<div class="wrap">
+
+  <div class="action-bar">
+    <div class="last-run" id="last-run">Not yet loaded</div>
+    <button class="gen-btn" id="gen-btn" onclick="runBrief()">▶ Generate Today's Brief</button>
+  </div>
+
+  <div class="prog-wrap">
+    <div class="prog-lbl" id="prog-lbl">Initialising…</div>
+    <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+  </div>
+
+  <div class="cols">
+
+    <!-- ══ COL 1: GROUND & SKY ══ -->
+    <div class="col">
+      <div class="col-hd">
+        <div class="col-hd-left"><span class="col-icon">🌿</span> Ground &amp; Sky</div>
+      </div>
+
+      <!-- Land profile editor -->
+      <button class="land-toggle" onclick="toggleLand()">
+        <span id="land-arrow">▸</span> Land profile
+      </button>
+      <div class="land-panel" id="land-panel">
+        <div style="font-size:0.75rem;color:var(--dim);margin-bottom:6px;line-height:1.5">
+          Describe what you grow, have, and tend at Arco de São Jorge. This shapes farming recommendations.
+        </div>
+        <textarea id="land-txt" placeholder="e.g. Vegetable beds (tomatoes, courgettes, beans), fruit trees (avocado, mango, banana), flowers (bird of paradise, strelitzia), greenhouse for seedlings and tropicals, stone terraces, sloped terrain..."></textarea>
+        <button class="land-save" onclick="saveLand()">Save profile</button>
+      </div>
+
+      <!-- Live weather -->
+      <div id="wx-block">
+        <div class="ld"><div class="ld-dots">Press Generate to load</div></div>
+      </div>
+
+      <!-- Farm action -->
+      <div id="farm-block">
+        <div class="ld"><div class="ld-dots"></div></div>
+      </div>
+    </div>
+
+    <div class="col-rule"></div>
+
+    <!-- ══ COL 2: SIGNALS + GAUGE ══ -->
+    <div class="col">
+      <div class="col-hd">
+        <div class="col-hd-left"><span class="col-icon">⚡</span> Signals &amp; Macro</div>
+      </div>
+
+      <!-- Macro gauge -->
+      <div id="gauge-block">
+        <div class="ld"><div class="ld-dots">Press Generate to load</div></div>
+      </div>
+
+      <!-- Breaking news signals -->
+      <div id="signals-col">
+        <div class="ld"><div class="ld-dots"></div></div>
+      </div>
+    </div>
+
+    <div class="col-rule"></div>
+
+    <!-- ══ COL 3: ACADEMIC & SCIENCE ══ -->
+    <div class="col">
+      <div class="col-hd">
+        <div class="col-hd-left"><span class="col-icon">🔬</span> Academic &amp; Science</div>
+      </div>
+      <div id="academic-col">
+        <div class="ld"><div class="ld-dots">Press Generate to load</div></div>
+      </div>
+    </div>
+
+    <div class="col-rule"></div>
+
+    <!-- ══ COL 4: MAYBE INTERESTING ══ -->
+    <div class="col">
+      <div class="col-hd">
+        <div class="col-hd-left"><span class="col-icon">✦</span> Maybe Interesting</div>
+        <span class="taste-chip" id="taste-chip"></span>
+      </div>
+      <div id="wild-col">
+        <div class="ld"><div class="ld-dots">Press Generate to load</div></div>
+      </div>
+    </div>
+
+  </div><!-- /cols -->
+
+  <div class="footer">
+    <span>Generated by Claude · Wunderground IARCOD6 · Live web search</span>
+    <span>Not financial advice · Personal use</span>
+  </div>
+</div><!-- /wrap -->
+
+<script>
+'use strict';
+
+// ════════════════════════════════════════════
+// CLOCK
+// ════════════════════════════════════════════
+function tickClock() {
+  const n = new Date();
+  document.getElementById('date-disp').textContent =
+    n.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  document.getElementById('time-disp').textContent =
+    n.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}) + ' WET';
+}
+tickClock(); setInterval(tickClock, 30000);
+
+// ════════════════════════════════════════════
+// STORAGE HELPERS
+// ════════════════════════════════════════════
+async function stGet(k) {
+  try { const r = await window.storage.get(k); return r ? JSON.parse(r.value) : null; }
+  catch(e) { return null; }
+}
+async function stSet(k, v) {
+  try { await window.storage.set(k, JSON.stringify(v)); } catch(e) {}
+}
+
+// ════════════════════════════════════════════
+// LAND PROFILE
+// ════════════════════════════════════════════
+const DEFAULT_LAND = `Terraced land in Arco de São Jorge, north coast of Madeira. Subtropical highland microclimate.
+Growing: vegetable beds, fruit trees (avocado, banana, mango), flowers and ornamentals, herbs.
+Infrastructure: greenhouse for seedlings and tropicals. Stone terracing, sloped terrain.
+Goals: subsistence growing, propagation, seasonal planting.`;
+
+let landProfile = DEFAULT_LAND;
+
+async function loadLand() {
+  const saved = await stGet('land-profile-v1');
+  if (saved) landProfile = saved;
+  document.getElementById('land-txt').value = landProfile;
+}
+
+async function saveLand() {
+  landProfile = document.getElementById('land-txt').value.trim() || DEFAULT_LAND;
+  await stSet('land-profile-v1', landProfile);
+  toggleLand();
+  document.getElementById('land-txt').value = landProfile;
+}
+
+function toggleLand() {
+  const p = document.getElementById('land-panel');
+  const a = document.getElementById('land-arrow');
+  const open = p.classList.toggle('open');
+  a.textContent = open ? '▾' : '▸';
+}
+
+// ════════════════════════════════════════════
+// UNIFIED TASTE PROFILE
+// ════════════════════════════════════════════
+let taste = { liked:[], disliked:[], likedW:{}, dislikedW:{}, totalRated:0 };
+
+async function loadTaste() {
+  const s = await stGet('taste-v2');
+  if (s) taste = s;
+  renderTasteChip();
+}
+
+async function saveTaste() { await stSet('taste-v2', taste); }
+
+function renderTasteChip() {
+  document.getElementById('taste-chip').textContent =
+    taste.totalRated === 0 ? 'rate to teach' : `↑${taste.liked.length} ↓${taste.disliked.length}`;
+}
+
+function recordFb(id, label, isUp) {
+  const lst = isUp ? taste.liked : taste.disliked;
+  const w   = isUp ? taste.likedW : taste.dislikedW;
+  if (!lst.includes(id)) { lst.push(id); taste.totalRated++; }
+  (label||'').toLowerCase().split(/[\s,\/\-\(\)]+/)
+    .filter(t => t.length > 3)
+    .forEach(t => { w[t] = (w[t]||0) + 1; });
+  saveTaste(); renderTasteChip();
+}
+
+// Build a taste context string injected into ALL Claude system prompts
+function tasteCtx() {
+  const topUp = Object.entries(taste.likedW).sort((a,b)=>b[1]-a[1]).slice(0,6).map(x=>x[0]);
+  const topDn = Object.entries(taste.dislikedW).sort((a,b)=>b[1]-a[1]).slice(0,6).map(x=>x[0]);
+  if (!topUp.length && !topDn.length) return '';
+  let s = '\n\n[User taste profile — apply across all content decisions]:';
+  if (topUp.length) s += ` Engages with: ${topUp.join(', ')}.`;
+  if (topDn.length) s += ` Avoid/deprioritise: ${topDn.join(', ')}.`;
+  return s;
+}
+
+// ════════════════════════════════════════════
+// CLAUDE API — full tool-use loop
+// ════════════════════════════════════════════
+async function claude(system, user) {
+  const tools = [{ type:'web_search_20250305', name:'web_search' }];
+  const msgs  = [{ role:'user', content: user }];
+  const fullSystem = system + tasteCtx();
+
+  for (let i = 0; i < 10; i++) {
+    const res  = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens: 2000,
+        system: fullSystem,
+        messages: msgs,
+        tools,
+      })
+    });
+    const d = await res.json();
+    if (d.error) throw new Error('API: ' + JSON.stringify(d.error));
+    const content = d.content || [];
+    if (d.stop_reason === 'end_turn')
+      return content.filter(b=>b.type==='text').map(b=>b.text).join('\n');
+    if (d.stop_reason === 'tool_use') {
+      msgs.push({role:'assistant', content});
+      msgs.push({role:'user', content: content.filter(b=>b.type==='tool_use').map(b=>({
+        type:'tool_result', tool_use_id:b.id, content: b.content??''
+      }))});
+      continue;
+    }
+    return content.filter(b=>b.type==='text').map(b=>b.text).join('\n');
+  }
+  throw new Error('Tool loop limit');
+}
+
+// ════════════════════════════════════════════
+// JSON EXTRACTOR
+// ════════════════════════════════════════════
+function xJSON(raw, type='array') {
+  const s = raw.replace(/```(?:json)?/gi,'').trim();
+  const o = type==='array' ? '[' : '{';
+  const c = type==='array' ? ']' : '}';
+  const st = s.indexOf(o);
+  if (st===-1) return null;
+  let depth=0, inStr=false, esc=false;
+  for (let i=st; i<s.length; i++) {
+    const ch = s[i];
+    if (esc)        { esc=false; continue; }
+    if (ch==='\\')  { esc=true;  continue; }
+    if (ch==='"')   { inStr=!inStr; continue; }
+    if (inStr)      continue;
+    if (ch===o) depth++;
+    if (ch===c) { depth--; if (depth===0) return s.slice(st,i+1); }
+  }
+  return null;
+}
+
+// ════════════════════════════════════════════
+// PROGRESS
+// ════════════════════════════════════════════
+function prog(pct, lbl) {
+  document.getElementById('prog-fill').style.width = pct+'%';
+  const el = document.getElementById('prog-lbl');
+  el.textContent = lbl; el.classList.add('on');
+}
+function progDone() {
+  prog(100,'Done.');
+  setTimeout(()=>{ document.getElementById('prog-lbl').classList.remove('on'); prog(0,''); }, 900);
+}
+function loading(id, msg='Searching') {
+  document.getElementById(id).innerHTML = `<div class="ld"><div class="ld-dots">${msg}</div></div>`;
+}
+
+// ════════════════════════════════════════════
+// 1. MARKETS
+// ════════════════════════════════════════════
+async function loadMarkets() {
+  try {
+    const raw = await claude(
+      `Financial data assistant. Return ONLY a valid JSON object, no markdown, no extra text.
+Schema: {"vix":"XX.XX","vix_change":"+X.XX","vix_mood":"calm|elevated|high|extreme","usdbrl":"X.XX","brl_change":"+X.XX","eurusd":"X.XXXX","eurusd_change":"+X.XXXX","one_line":"≤12 words"}`,
+      `Search for: current VIX index value today, current USD/BRL exchange rate, current EUR/USD rate. Return only the JSON.`
+    );
+    const m = xJSON(raw,'object');
+    if (!m) throw new Error('no JSON');
+    const d = JSON.parse(m);
+    const mc = {calm:'up',elevated:'neu',high:'dn',extreme:'dn'};
+    document.getElementById('t-vix').innerHTML =
+      `<span class="${mc[d.vix_mood]||'neu'}">${d.vix}</span> <span style="font-size:.58rem;color:#6a6050">${d.vix_change} ${d.vix_mood}</span>`;
+    document.getElementById('t-brl').innerHTML =
+      `${d.usdbrl} <span style="font-size:.58rem;color:#6a6050">${d.brl_change}</span>`;
+    document.getElementById('t-eur').innerHTML =
+      `${d.eurusd} <span style="font-size:.58rem;color:#6a6050">${d.eurusd_change}</span>`;
+    document.getElementById('t-mood').textContent = d.one_line;
+  } catch(e) {
+    document.getElementById('t-mood').textContent = 'Market data unavailable';
+    console.error('Markets:',e);
+  }
+}
+
+// ════════════════════════════════════════════
+// 2. WEATHER + FARMING
+// ════════════════════════════════════════════
+async function loadWeatherAndFarm() {
+  loading('wx-block','Fetching IARCOD6');
+  loading('farm-block');
+
+  // Fetch Wunderground personal weather station
+  let wxData = null;
+  let wxHtml = '';
+  try {
+    // Wunderground current conditions for IARCOD6
+    const wxRes = await fetch(
+      'https://api.weather.com/v2/pws/observations/current?stationId=IARCOD6&format=json&units=m&apiKey=e1f10a1e78da46f5b10a1e78da96f525'
+    );
+    // Note: above key is placeholder; we'll use the AI to fetch & interpret instead
+    throw new Error('use AI fetch');
+  } catch(_) {
+    // Fallback: use Claude with web search to get weather data
+    try {
+      const wxRaw = await claude(
+        `You are a weather data assistant for a personal weather station in Arco de São Jorge, Madeira (north coast, elevation ~400m).
+Fetch current conditions from Wunderground station IARCOD6.
+Return ONLY a JSON object, no markdown:
+{"temp_c":"XX.X","humidity":"XX","wind_kph":"XX","wind_dir":"N/NE/etc","precip_today_mm":"X.X","precip_yesterday_mm":"X.X","condition":"brief description","uv":"X","pressure_mb":"XXXX","feels_like_c":"XX.X","forecast_today":"brief 1-sentence forecast for Arco de São Jorge area today"}`,
+        `Search for: Wunderground station IARCOD6 current weather Arco de São Jorge Madeira, current conditions temperature humidity rainfall. Return only the JSON object.`
+      );
+      const wm = xJSON(wxRaw,'object');
+      if (wm) wxData = JSON.parse(wm);
+    } catch(e2) { console.error('wx:',e2); }
+  }
+
+  // Render weather block
+  if (wxData) {
+    const d = wxData;
+    document.getElementById('wx-block').innerHTML = `
+      <div class="wx-block">
+        <div class="wx-row">
+          <div class="wx-cell">
+            <span class="wx-lbl">Temp</span>
+            <span class="wx-val big">${d.temp_c}°</span>
+          </div>
+          <div class="wx-cell">
+            <span class="wx-lbl">Humidity</span>
+            <span class="wx-val big">${d.humidity}%</span>
+          </div>
+          <div class="wx-cell">
+            <span class="wx-lbl">Wind</span>
+            <span class="wx-val">${d.wind_kph} km/h ${d.wind_dir}</span>
+          </div>
+        </div>
+        <div class="wx-row">
+          <div class="wx-cell">
+            <span class="wx-lbl">UV Index</span>
+            <span class="wx-val">${d.uv}</span>
+          </div>
+          <div class="wx-cell">
+            <span class="wx-lbl">Pressure</span>
+            <span class="wx-val">${d.pressure_mb} mb</span>
+          </div>
+          <div class="wx-cell">
+            <span class="wx-lbl">Feels like</span>
+            <span class="wx-val">${d.feels_like_c}°</span>
+          </div>
+        </div>
+        <div class="wx-precip">
+          Rain today: ${d.precip_today_mm} mm &nbsp;·&nbsp; Yesterday: ${d.precip_yesterday_mm} mm
+          <br>${d.forecast_today}
+        </div>
+      </div>`;
+
+    // Now get farming action using weather context
+    try {
+      const month = new Date().toLocaleString('en-GB',{month:'long'});
+      const farmRaw = await claude(
+        `You are an expert in subtropical highland agriculture and Madeiran farming traditions.
+Given current hyperlocal weather data and a land profile, suggest ONE specific, actionable task for today.
+Be concrete and practical — not generic advice. Think about: soil moisture from yesterday's rain, temperature for transplanting, UV for hardening off seedlings, wind affecting pollination, etc.
+Consider the greenhouse as an option (e.g. if it is too windy or rainy outside).
+Today is ${new Date().toDateString()} (${month}, ${getSeason()}).
+
+Land profile:
+${landProfile}
+
+Current conditions at Arco de São Jorge:
+- Temperature: ${wxData.temp_c}°C (feels like ${wxData.feels_like_c}°C)
+- Humidity: ${wxData.humidity}%
+- Wind: ${wxData.wind_kph} km/h ${wxData.wind_dir}
+- Rain today: ${wxData.precip_today_mm} mm | Yesterday: ${wxData.precip_yesterday_mm} mm
+- UV: ${wxData.uv} | Pressure: ${wxData.pressure_mb} mb
+- Conditions: ${wxData.condition}
+- Forecast: ${wxData.forecast_today}
+
+Return ONLY a JSON object, no markdown:
+{"action":"specific task in one short sentence","reason":"why today's conditions make this ideal (1-2 sentences)","alt":"one alternative if primary isn't possible","location":"outdoor|greenhouse|either"}`,
+        `Based on these exact conditions and land profile, what is the single best farming or gardening task for today at this property? Return only the JSON.`
+      );
+      const fm = xJSON(farmRaw,'object');
+      if (fm) {
+        const f = JSON.parse(fm);
+        const locIcon = {outdoor:'🌱', greenhouse:'🏡', either:'🌿'}[f.location]||'🌱';
+        document.getElementById('farm-block').innerHTML = `
+          <div class="farm-action">
+            <div class="farm-action-lbl">${locIcon} Today's task · ${f.location}</div>
+            <div class="farm-action-main">${f.action}</div>
+            <div class="farm-action-why">${f.reason}</div>
+            <div class="farm-action-alt">If not: ${f.alt}</div>
+          </div>`;
+      } else throw new Error('no farm JSON');
+    } catch(e) {
+      document.getElementById('farm-block').innerHTML =
+        '<p style="color:var(--accent);font-size:.78rem;padding:8px 0">Could not generate farm recommendation.</p>';
+      console.error('Farm:',e);
+    }
+  } else {
+    document.getElementById('wx-block').innerHTML =
+      '<p style="color:var(--accent);font-size:.78rem">Weather data unavailable.</p>';
+    document.getElementById('farm-block').innerHTML = '';
+  }
+}
+
+function getSeason() {
+  const m = new Date().getMonth(); // 0-indexed
+  if (m>=2&&m<=4) return 'Spring';
+  if (m>=5&&m<=7) return 'Summer';
+  if (m>=8&&m<=10) return 'Autumn';
+  return 'Winter';
+}
+
+// ════════════════════════════════════════════
+// 3. SIGNALS + MACRO GAUGE (one combined call)
+// ════════════════════════════════════════════
+async function loadSignalsAndGauge() {
+  loading('gauge-block');
+  loading('signals-col');
+  const today = new Date().toDateString();
+  try {
+    const raw = await claude(
+      `You are a financial macro analyst and news filter combined. Search for today's news and return a single JSON object with two parts.
+
+PART 1 — macro_gauge: Assess the current macro environment for a private investor with exposure to: global equities, Brazilian real estate, USD/BRL, EUR/USD.
+Score from 0-100 where 0=fully calm/hold, 100=strong signal to review portfolio.
+Threshold guidance: 0-33=calm (no action), 34-66=watch (monitor), 67-100=consider reviewing.
+
+PART 2 — signals: Only include if genuinely breaking (declared war, earthquake 6.5+, market crash -3%+, head of state death, mass casualty disaster). Empty array if nothing qualifies.
+
+Return ONLY this JSON, no markdown:
+{
+  "gauge": {
+    "score": 0-100,
+    "level": "calm|watch|review",
+    "reasons": ["reason 1","reason 2","reason 3"]
+  },
+  "signals": [
+    {"label":"CATEGORY","headline":"text","summary":"2-3 sentences","urgency":"critical|high"}
+  ]
+}
+Today: ${today}.`,
+      `Search: major breaking world news today ${today}, stock market movements today, USD BRL news today, global macro risks today. Return only the JSON object.`
+    );
+    const m = xJSON(raw,'object');
+    if (!m) throw new Error('no JSON: '+raw.slice(0,200));
+    const d = JSON.parse(m);
+
+    // Render gauge
+    const g = d.gauge || {};
+    const score = Math.min(100, Math.max(0, g.score||0));
+    const lvl = g.level || (score < 34 ? 'calm' : score < 67 ? 'watch' : 'review');
+    const lvlLabel = {calm:'● Calm — hold course', watch:'◐ Watch — stay alert', review:'○ Consider reviewing'}[lvl];
+    const reasons = (g.reasons||[]).map(r=>`<li>${r}</li>`).join('');
+    document.getElementById('gauge-block').innerHTML = `
+      <div class="gauge-wrap">
+        <div class="gauge-title">Portfolio macro stress</div>
+        <div class="gauge-track">
+          <div class="gauge-bar ${lvl}" style="width:${score}%"></div>
+        </div>
+        <div class="gauge-markers"><span>Hold</span><span>Watch</span><span>Review</span></div>
+        <div class="gauge-reading ${lvl}">${lvlLabel}</div>
+        <ul class="gauge-reasons" style="padding-left:1.2em;font-size:.78rem;line-height:1.7;color:#3a3428">
+          ${reasons}
+        </ul>
+      </div>`;
+
+    // Render signals
+    const sigs = d.signals || [];
+    if (sigs.length === 0) {
+      document.getElementById('signals-col').innerHTML = `
+        <div class="quiet">
+          <span class="quiet-lbl">✓ No breaking events</span>
+          Nothing requiring immediate attention today.
+        </div>`;
+    } else {
+      document.getElementById('signals-col').innerHTML = sigs.map(s=>`
+        <div class="card">
+          <div class="card-tag">${s.urgency==='critical'?'🔴':'🟠'} ${s.label}</div>
+          <div class="card-hed">${s.headline}</div>
+          <div class="card-body">${s.summary}</div>
+        </div>`).join('');
+    }
+  } catch(e) {
+    document.getElementById('gauge-block').innerHTML =
+      '<p style="color:var(--accent);font-size:.78rem">Could not load macro gauge.</p>';
+    document.getElementById('signals-col').innerHTML = '';
+    console.error('Signals+Gauge:',e);
+  }
+}
+
+// ════════════════════════════════════════════
+// 4. ACADEMIC & SCIENCE
+// ════════════════════════════════════════════
+async function loadAcademic() {
+  loading('academic-col');
+  const today = new Date().toDateString();
+  try {
+    const raw = await claude(
+      `Academic research assistant focused on philosophy and health science.
+Find two content types:
+1. CALLS FOR PAPERS (CFPs / editais) — philosophy conferences, journals, competitions. Include deadline if known.
+2. NEW PEER-REVIEWED STUDIES (last 4 weeks) — sleep & recovery, exercise & longevity, diet & nutrition, cognitive performance. Only include studies with clear practical daily-life implications.
+
+Return ONLY a JSON array of 4-5 items, no markdown:
+[{"type":"cfp|science","label":"LABEL","headline":"headline","summary":"2-3 sentences with key finding or deadline","source":"venue/journal"}]
+CFP label: "CALL FOR PAPERS" | Science labels: "SLEEP", "EXERCISE", "NUTRITION", "COGNITION"
+Today: ${today}.`,
+      `Search: philosophy call for papers CFP conference 2025 2026, new peer-reviewed study sleep exercise nutrition cognition practical ${new Date().getFullYear()}.`
+    );
+    const m = xJSON(raw,'array');
+    if (!m) throw new Error('no JSON: '+raw.slice(0,200));
+    const items = JSON.parse(m);
+    document.getElementById('academic-col').innerHTML = items.map(s=>`
+      <div class="card">
+        <div class="card-tag ${s.type==='cfp'?'b':'g'}">${s.label}</div>
+        <div class="card-hed">${s.headline}</div>
+        <div class="card-body">${s.summary}</div>
+        ${s.source?`<div class="card-sub">📄 ${s.source}</div>`:''}
+      </div>`).join('');
+  } catch(e) {
+    document.getElementById('academic-col').innerHTML =
+      '<p style="color:var(--accent);font-size:.78rem">Could not load academic feed.</p>';
+    console.error('Academic:',e);
+  }
+}
+
+// ════════════════════════════════════════════
+// 5. MAYBE INTERESTING (taste-driven)
+// ════════════════════════════════════════════
+async function loadWild() {
+  loading('wild-col');
+  const today = new Date().toDateString();
+  try {
+    const raw = await claude(
+      `Eclectic curator for a curious, well-read person in Madeira, Portugal.
+Interests: philosophy, health science, Brazil, Portugal, history of ideas, unusual science, technology with humanistic implications, economics, culture, art, architecture.
+Find 4 genuinely surprising or intellectually stimulating stories that reward curiosity.
+Avoid: sports, celebrity gossip, routine politics, product launches, listicles.
+Vary the domains — don't cluster in one area.
+The taste profile injected into this prompt should actively shape which stories you choose and how you frame them.
+
+Return ONLY a JSON array, no markdown:
+[{"id":"3-word-slug","label":"TOPIC","headline":"headline","summary":"2-3 engaging sentences","why":"one sentence on why this is interesting or surprising"}]
+Today: ${today}.`,
+      `Search: fascinating science discovery this week, surprising history ideas culture story, unusual intellectual news ${today}, remarkable recent finding.`
+    );
+    const m = xJSON(raw,'array');
+    if (!m) throw new Error('no JSON: '+raw.slice(0,200));
+    const items = JSON.parse(m);
+    document.getElementById('wild-col').innerHTML = items.map(s=>`
+      <div class="wild-card" id="wc-${s.id}">
+        <div class="card-tag">${s.label}</div>
+        <div class="card-hed">${s.headline}</div>
+        <div class="card-body">${s.summary}</div>
+        <div class="card-why">✦ ${s.why}</div>
+        <div class="fb-row">
+          <button class="fb" id="up-${s.id}" onclick="doFb('${s.id}','${s.label.replace(/'/g,"\\'")}',true)">👍 yes</button>
+          <button class="fb" id="dn-${s.id}" onclick="doFb('${s.id}','${s.label.replace(/'/g,"\\'")}',false)">👎 no</button>
+        </div>
+      </div>`).join('');
+
+    // Restore saved ratings visually
+    items.forEach(s => {
+      if (taste.liked.includes(s.id))    setFbUi(s.id,true);
+      if (taste.disliked.includes(s.id)) setFbUi(s.id,false);
+    });
+  } catch(e) {
+    document.getElementById('wild-col').innerHTML =
+      '<p style="color:var(--accent);font-size:.78rem">Could not load wildcard feed.</p>';
+    console.error('Wild:',e);
+  }
+}
+
+function setFbUi(id, isUp) {
+  const u = document.getElementById('up-'+id);
+  const d = document.getElementById('dn-'+id);
+  if (!u||!d) return;
+  u.className = 'fb' + (isUp  ? ' up'   : '');
+  d.className = 'fb' + (!isUp ? ' down' : '');
+}
+
+function doFb(id, label, isUp) {
+  recordFb(id, label, isUp);
+  setFbUi(id, isUp);
+}
+
+// ════════════════════════════════════════════
+// MAIN ORCHESTRATOR
+// ════════════════════════════════════════════
+async function runBrief() {
+  const btn = document.getElementById('gen-btn');
+  btn.disabled = true; btn.textContent = '⏳ Generating…';
+
+  const steps = [
+    { fn: loadMarkets,           lbl: 'Fetching markets…',           pct: 8  },
+    { fn: loadWeatherAndFarm,    lbl: 'Reading IARCOD6 weather…',    pct: 30 },
+    { fn: loadSignalsAndGauge,   lbl: 'Scanning signals & macro…',   pct: 55 },
+    { fn: loadAcademic,          lbl: 'Searching academic feeds…',   pct: 78 },
+    { fn: loadWild,              lbl: 'Curating wildcards…',         pct: 93 },
+  ];
+
+  for (const s of steps) {
+    prog(s.pct, s.lbl);
+    await s.fn();
+  }
+
+  progDone();
+  document.getElementById('last-run').textContent =
+    'Last generated: ' + new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+  btn.disabled = false; btn.textContent = '↺ Refresh Brief';
+}
+
+// ════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════
+(async () => {
+  await loadLand();
+  await loadTaste();
+})();
+</script>
+</body>
+</html>
