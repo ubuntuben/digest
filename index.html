@@ -150,6 +150,16 @@ body { background: var(--bg); color: var(--ink); font-family: 'Lato', sans-serif
 </head>
 <body>
 
+<!-- API KEY SETUP BANNER -->
+<div id="api-banner" style="background:#2a1a0a;border-bottom:2px solid #8b3a2a;padding:10px 36px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+  <span style="font-family:'JetBrains Mono',monospace;font-size:.62rem;color:#c8a070;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap">Anthropic API Key</span>
+  <input id="api-key-input" type="password" placeholder="sk-ant-..." 
+    style="font-family:'JetBrains Mono',monospace;font-size:.68rem;background:#1c1a14;border:1px solid #4a3a2a;color:#f2ece0;padding:5px 10px;flex:1;min-width:260px;max-width:420px"
+    oninput="saveKey(this.value)">
+  <span id="key-status" style="font-family:'JetBrains Mono',monospace;font-size:.58rem;color:#6a6050"></span>
+  <span style="font-family:'JetBrains Mono',monospace;font-size:.56rem;color:#4a4030;max-width:300px;line-height:1.5">Key is stored only in your browser's localStorage — never sent anywhere except Anthropic's API.</span>
+</div>
+
 <div class="masthead">
   <div>
     <div class="mast-title">Morning <em>Brief</em></div>
@@ -182,7 +192,7 @@ body { background: var(--bg); color: var(--ink); font-family: 'Lato', sans-serif
     <div class="last-run" id="last-run">Not yet loaded</div>
     <button class="gen-btn" id="gen-btn" onclick="runBrief(true)">▶ Generate Today's Brief</button>
   </div>
-  <div id="debug-panel" style="display:none;background:#1c1a14;color:#a0f0a0;font-family:'JetBrains Mono',monospace;font-size:.6rem;padding:10px 14px;margin-bottom:10px;white-space:pre-wrap;max-height:200px;overflow-y:auto;line-height:1.6;border-left:3px solid #6aaa6a"></div>
+
   <div class="prog-wrap">
     <div class="prog-lbl" id="prog-lbl">—</div>
     <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
@@ -348,8 +358,11 @@ async function claude(system, user) {
   const sys   = system + tasteCtx();
   dbg('Claude call starting (round 0)...');
   for (let i=0; i<10; i++) {
+    const apiKey = localStorage.getItem('anthropic-api-key') || '';
+    if (!apiKey) throw new Error('No API key set — paste your Anthropic key in the banner at the top.');
     const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method:'POST', headers:{'Content-Type':'application/json'},
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
       body: JSON.stringify({model:'claude-sonnet-4-20250514', max_tokens:2500, system:sys, messages:msgs, tools})
     });
     const d = await res.json();
@@ -738,8 +751,27 @@ async function runBrief(forceRefresh = false) {
   btn.disabled = false; btn.textContent = '↺ Refresh Brief';
 }
 
+// ─── API KEY ─────────────────────────────────────────────
+function saveKey(val) {
+  val = val.trim();
+  if (val) {
+    localStorage.setItem('anthropic-api-key', val);
+    document.getElementById('key-status').textContent = '✓ saved';
+    document.getElementById('key-status').style.color = '#6aaa6a';
+  }
+}
+function loadKey() {
+  const k = localStorage.getItem('anthropic-api-key') || '';
+  if (k) {
+    document.getElementById('api-key-input').value = k;
+    document.getElementById('key-status').textContent = '✓ key loaded';
+    document.getElementById('key-status').style.color = '#6aaa6a';
+  }
+}
+
 // ─── INIT ────────────────────────────────────────────────
 (async () => {
+  loadKey();
   await loadLand();
   await loadTaste();
   // Auto-load from cache on open (no API call)
