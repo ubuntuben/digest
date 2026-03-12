@@ -182,6 +182,7 @@ body { background: var(--bg); color: var(--ink); font-family: 'Lato', sans-serif
     <div class="last-run" id="last-run">Not yet loaded</div>
     <button class="gen-btn" id="gen-btn" onclick="runBrief(true)">▶ Generate Today's Brief</button>
   </div>
+  <div id="debug-panel" style="display:none;background:#1c1a14;color:#a0f0a0;font-family:'JetBrains Mono',monospace;font-size:.6rem;padding:10px 14px;margin-bottom:10px;white-space:pre-wrap;max-height:200px;overflow-y:auto;line-height:1.6;border-left:3px solid #6aaa6a"></div>
   <div class="prog-wrap">
     <div class="prog-lbl" id="prog-lbl">—</div>
     <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
@@ -345,14 +346,16 @@ async function claude(system, user) {
   const tools = [{type:'web_search_20250305', name:'web_search'}];
   const msgs  = [{role:'user', content:user}];
   const sys   = system + tasteCtx();
+  dbg('Claude call starting (round 0)...');
   for (let i=0; i<10; i++) {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({model:'claude-sonnet-4-20250514', max_tokens:2500, system:sys, messages:msgs, tools})
     });
     const d = await res.json();
-    if (d.error) throw new Error('API: '+JSON.stringify(d.error));
+    if (d.error) { const emsg = 'API error: '+JSON.stringify(d.error); dbg(emsg); throw new Error(emsg); }
     const content = d.content||[];
+    dbg('Round '+i+' stop_reason='+d.stop_reason+' content_blocks='+content.length+' types='+content.map(b=>b.type).join(','));
     if (d.stop_reason==='end_turn')
       return content.filter(b=>b.type==='text').map(b=>b.text).join('\n');
     if (d.stop_reason==='tool_use') {
@@ -607,7 +610,7 @@ Suggest ONE specific actionable task. Consider soil moisture from rain, temp for
   );
 
   const m = xJSON(raw,'object');
-  if (!m) throw new Error('no JSON object in call 1: '+raw.slice(0,200));
+  if (!m) { dbg('Call 1 raw (first 400): ' + raw.slice(0,400)); throw new Error('no JSON object in call 1'); }
   return JSON.parse(m);
 }
 
@@ -645,8 +648,17 @@ WILD rules (4 items):
   );
 
   const m = xJSON(raw,'object');
-  if (!m) throw new Error('no JSON object in call 2: '+raw.slice(0,200));
+  if (!m) { dbg('Call 2 raw (first 400): ' + raw.slice(0,400)); throw new Error('no JSON object in call 2'); }
   return JSON.parse(m);
+}
+
+// ─── DEBUG HELPER ────────────────────────────────────────
+function dbg(msg) {
+  const p = document.getElementById('debug-panel');
+  p.style.display = 'block';
+  p.textContent += '[' + new Date().toLocaleTimeString() + '] ' + msg + '\n';
+  p.scrollTop = p.scrollHeight;
+  console.log('[DEBUG]', msg);
 }
 
 // ─── MAIN ORCHESTRATOR ───────────────────────────────────
@@ -663,6 +675,7 @@ async function runBrief(forceRefresh = false) {
 
   // Hide cache notice, start fresh
   document.getElementById('cache-notice').classList.add('hidden');
+  const dbgp = document.getElementById('debug-panel'); dbgp.textContent=''; dbgp.style.display='none';
   const btn = document.getElementById('gen-btn');
   btn.disabled = true; btn.textContent = '⏳ Generating…';
 
@@ -685,8 +698,9 @@ async function runBrief(forceRefresh = false) {
     if (c1.farm)            renderFarm(c1.farm);
   } catch(e) {
     console.error('Call 1:',e);
-    document.getElementById('gauge-block').innerHTML = '<p class="err">Could not load macro data.</p>';
-    document.getElementById('t-mood').textContent = 'Markets unavailable';
+    dbg('CALL 1 ERROR: ' + e.message);
+    document.getElementById('gauge-block').innerHTML = '<p class="err">Could not load macro data. See debug panel.</p>';
+    document.getElementById('t-mood').textContent = 'Error — see debug';
   }
 
   // Step 3: Claude call 2 — academic + wildcard
@@ -701,8 +715,9 @@ async function runBrief(forceRefresh = false) {
     if (c2.wild)     renderWild(c2.wild);
   } catch(e) {
     console.error('Call 2:',e);
-    document.getElementById('academic-col').innerHTML = '<p class="err">Could not load academic feed.</p>';
-    document.getElementById('wild-col').innerHTML     = '<p class="err">Could not load wildcard feed.</p>';
+    dbg('CALL 2 ERROR: ' + e.message);
+    document.getElementById('academic-col').innerHTML = '<p class="err">Could not load academic feed. See debug panel.</p>';
+    document.getElementById('wild-col').innerHTML     = '<p class="err">Could not load wildcard feed. See debug panel.</p>';
   }
 
   // Save to cache
